@@ -6,3 +6,4 @@ __pycache__
 blueprints/__pycache__
 modules/__pycache__
 /.idea
+.env
