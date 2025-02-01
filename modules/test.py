@@ -4,7 +4,7 @@ from mysql.connector import Error
 from dotenv import load_dotenv
 import os
 
-from modules.aws_db import DatabaseCRUD
+from aws_db import DatabaseCRUD
 
 load_dotenv()
 
