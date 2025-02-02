@@ -11,9 +11,6 @@ from flask import (
     jsonify,
 )
 from werkzeug.security import generate_password_hash, check_password_hash
-from modules.database import *
-from blueprints.user import user
-from blueprints.filmmaker import filmmaker, updateFilmScreeningStatus
 from datetime import datetime
 import base64
 
@@ -35,11 +32,6 @@ aws_db = DatabaseCRUD(
 app = Flask(__name__)
 app.app_context().push()
 app.config["SECRET_KEY"] = "your_secret_key_here"
-
-# Register blueprints
-app.register_blueprint(user, url_prefix="/user")
-app.register_blueprint(filmmaker, url_prefix="/filmmaker")
-
 
 # Define teardown app context
 @app.teardown_appcontext
@@ -138,154 +130,6 @@ def profile():
     else:
         return redirect(url_for("login"))
 
-@app.route("/moviebooking/<int:filmid>", methods=["GET", "POST"])
-def moviebooking(filmid):
-    try:
-        # Connect to the database
-        db = get_sqlite_database()
-        cursor = db.cursor()
-
-        cursor.execute(
-            """
-            SELECT Film.filmId, Film.filmmakerid, Film.filmName, Film.filmCast, 
-            Film.filmPoster, Film.filmSynopsis, Film.filmRunTime, Film.filmReleaseDate,
-            Film.filmMaturityRating,
-                   COALESCE(Film.filmLanguage, "No information"), 
-                   COALESCE(Film.filmGenre, "No information"), 
-                   COALESCE(Filmmaker.filmmakerName, "No information")
-            FROM Film 
-            LEFT JOIN Filmmaker ON Film.filmmakerId = Filmmaker.filmmakerId 
-            WHERE Film.filmId = ? 
-        """,
-            (filmid,),
-        )
-        data_row = cursor.fetchone()
-
-        if not data_row:
-            return redirect(url_for("error404"))
-
-        film_data = data_row[:9]
-        language, genre, filmmaker_name = data_row[9:]
-
-        (
-            film_id,
-            _,
-            film_name,
-            film_cast,
-            film_poster_blob,
-            film_synopsis,
-            film_runtime,
-            film_release_date,
-            film_maturity_rating,
-        ) = film_data
-        film_poster_base64 = base64.b64encode(film_poster_blob).decode("utf-8")
-
-        updateFilmScreeningStatus(film_id, db, cursor)
-
-        # Get the studios for this film
-        cursor.execute(
-            """
-            SELECT DISTINCT Studio.studioId, Studio.studioName, Studio.studioAddress
-            FROM Screening 
-            JOIN Studio ON Screening.studioId = Studio.studioId 
-            WHERE Screening.filmId = ? AND screeningStatus != "Finished"
-        """,
-            (filmid,),
-        )
-        studios = cursor.fetchall()
-
-        # Get the film reviews with username from User table
-        cursor.execute(
-            """
-            SELECT r.*, u.userName 
-            FROM Film_Review r 
-            INNER JOIN User u ON r.userId = u.userId 
-            WHERE r.filmId = ?
-        """,
-            (filmid,),
-        )
-
-        reviews = cursor.fetchall()
-        current_user_id = None
-        if "accountId" in session:
-            current_user_id = session["accountId"]
-
-        userReview = False
-        cursor.execute(
-            """
-            SELECT COUNT(*) FROM Booking
-            WHERE userId = ? AND filmName = (
-                SELECT filmName FROM Film WHERE filmId = ?
-            )
-            """,
-            (current_user_id, filmid),
-        )
-        booking_count = cursor.fetchone()[0]
-        userReview = booking_count > 0
-
-        # Pass the reviews to the template
-        return render_template(
-            "moviebooking.html",
-            filmid=film_id,
-            film_name=film_name,
-            film_cast=film_cast,
-            film_poster_base64=film_poster_base64,
-            film_synopsis=film_synopsis,
-            film_runtime=film_runtime,
-            film_release_date=film_release_date,
-            film_maturity_rating=film_maturity_rating,
-            studios=studios,
-            reviews=reviews,
-            film_language=language,
-            film_genre=genre,
-            filmmaker_name=filmmaker_name,
-            current_user_id=current_user_id,
-            userReview=userReview,
-        )
-
-    except Exception as e:
-        db.rollback()
-        print(f"An error occurred: {e}")
-
-
-@app.route("/get_screenings/<int:filmid>/<int:studioid>")
-def get_screenings(filmid, studioid):
-    try:
-        db = get_sqlite_database()
-        cursor = db.cursor()
-
-        cursor.execute(
-            """
-            SELECT screeningDate, screeningTime, screeningCapacity, screeningOriginalCapacity, screeningId, screeningPrice
-            FROM Screening
-            WHERE filmId = ? AND studioId = ? AND screeningStatus != "Finished"
-            ORDER BY screeningDate, screeningTime""",
-            (filmid, studioid),
-        )
-
-        screenings = cursor.fetchall()
-
-        result = {}
-        for screening in screenings:
-            date, time, capacity, originalCapacity, id, screeningPrice = screening
-
-            if date not in result:
-                result[date] = []
-
-            result[date].append(
-                {
-                    "time": time,
-                    "capacity": capacity,
-                    "originalCapacity": originalCapacity,
-                    "screeningId": id,
-                    "screeningPrice": screeningPrice,
-                }
-            )
-        return jsonify(result)
-
-    except Exception as e:
-        return jsonify({"error": f"An error occurred: {e}"})
-
 
 # Define account login route
 @app.route("/login", methods=["GET", "POST"])
@@ -354,9 +198,5 @@ def error404():
 
 
 if __name__ == "__main__":
-    # Initialise SQLite DB
-    with app.app_context():
-        create_all_tables(get_sqlite_database().cursor())
-
     app.run(debug=True)
     # app.run(host='0.0.0.0', port=5000, debug=True)
