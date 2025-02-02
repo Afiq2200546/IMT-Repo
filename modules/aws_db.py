@@ -104,6 +104,15 @@ class DatabaseCRUD:
         except Error as e:
             print(f"Error getting user: {e}")
             return None
+    
+    def get_user_by_email(self, email):
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM Users WHERE email = %s", (email,))
+            return cursor.fetchone()
+        except Error as e:
+            print(f"Error fetching user: {e}")
+            return None
 
     # Add similar CRUD methods for Category and Products
     # Category CRUD Operations
