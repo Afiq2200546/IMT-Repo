@@ -1,5 +1,4 @@
 <html lang="en">
-
 <head>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -9,64 +8,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% include "header.html" %}
-    <link href="{{ url_for('static',filename='styles/styles.css') }}" rel="stylesheet" />
 </head>
 
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100 bg-light">
     {% include "navbar.html" %}
-    <main class="container-fluid px-3 px-md-5">
-        <div class="row">
-            <div class="col-sm-12 col-md-9 mt-0 mt-md-2 py-4 px-5 bg-light rounded">
-                <div class="tab-content" id="v-pills-tabContent">
-                    <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
-                        <div id="personal-view">
-                            <form action="/profile" method="post">
-                                <div class="row gx-lg-5">
-                                    <div class="col align-self-center">PERSONAL INFORMATION</div>
+    
+    <main class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Personal Information</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="/profile" method="post">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Username</label>
+                                <input type="text" id="username" name="username" 
+                                    class="form-control form-control-lg" 
+                                    value="{{ user.username }}">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email" id="email" name="email" 
+                                    class="form-control form-control-lg" 
+                                    value="{{ user.email }}">
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label class="form-label fw-bold">Role</label>
+                                    <input type="text" class="form-control form-control-lg" 
+                                        value="{{ user.role }}" readonly>
                                 </div>
-                                <hr />
-                                <div class="row justify-content-center">
-                                    <div class="col-12 col-md-8">
-                                        <label>Username</label>
-                                        <input type="text" id="username" name="username" class="form-control" value="{{ user.username }}">
-                                    </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Company</label>
+                                    <input type="text" class="form-control form-control-lg" 
+                                        value="{{ company.name if company else 'N/A' }}" readonly>
                                 </div>
-                                <br />
-                                <div class="row justify-content-center">
-                                    <div class="col-12 col-md-4">
-                                        <label>Email</label>
-                                        <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}">
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <label>Phone Number</label>
-                                        <input type="text" id="phonenumber" name="phonenumber" class="form-control" value="{{ user.phone_number }}">
-                                    </div>
-                                </div>
-                                <br />
-                                <div class="row justify-content-center">
-                                    <div class="col-12 col-md-4">
-                                        <label>Role</label>
-                                        <input type="text" class="form-control" value="{{ user.role }}" readonly>
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <label>Company</label>
-                                        <input type="text" class="form-control" value="{{ company.name if company else 'N/A' }}" readonly>
-                                    </div>
-                                </div>
-                                <br />
-                                <div class="row justify-content-center">
-                                    <div class="col-12 col-md-8">
-                                        <button type="submit" class="btn btn-primary btn-lg btn-block">Update</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" 
+                                    class="btn btn-primary btn-lg">
+                                    Update Profile
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+
     {% include "footer.html" %}
 </body>
-
 </html>

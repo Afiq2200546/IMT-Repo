@@ -114,9 +114,8 @@ def profile():
         if request.method == "POST":
             updated_username = request.form.get("username")
             updated_email = request.form.get("email")
-            updated_phone_number = request.form.get("phonenumber")
 
-            aws_db.update_user(user_id, username=updated_username, email=updated_email, phone_number=updated_phone_number)
+            aws_db.update_user(user_id, username=updated_username, email=updated_email)
             flash("Your account has been updated!", "success")
             return redirect(url_for("profile"))
         
