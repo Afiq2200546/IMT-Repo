@@ -15,48 +15,79 @@
 <body>
     <!-- Navigation-->
     {% include 'navbar.html' %}
-    
-    <!-- Header-->
-    <header class="bg-dark py-5">
-        <div class="container px-4 px-lg-5 my-5">
-            <div class="text-center text-white">
-                <!-- Movie-themed background image -->
-                <img src="{{ url_for('static', filename='img/posterIndex.jpg') }}" alt="Movie Background" style="width: 100%; max-width: 600px; height: auto;">
-                <h1 class="display-4 fw-bolder" style="font-family: 'YourMovieFont', sans-serif;">Explore the Cinematic World</h1>
-                <p class="lead fw-normal text-white-50 mb-0">Discover the latest movies and cinematic experiences</p>
-                <p class="lead fw-normal text-white-50 mb-0">Get tickets now!</p>
-            </div>
-        </div>
-    </header>
 
-    <!-- Section - Movies -->
-    <section class="py-5">
-        <div class="container px-4 px-lg-5 mt-5">
-            <div class="row justify-content-center">
-                {% for film in films_list %}
-                    <div class="col mb-5">
-                        <div class="card h-100">
-                            <!-- Product image-->
-                            <img src="data:image/png;base64,{{ film.film_poster_base64 }}" alt="Film Poster">
-                            <!-- Product details-->
-                            <div class="card-body p-4">
-                                <div class="text-center">
-                                    <!-- Product name-->
-                                    <h5 class="fw-bolder">{{ film.film_name }}</h5>
-                                    <!-- Product Run Time-->
-                                    <p>Duration: {{ film.film_runtime }} minutes</p>
-                                </div>
-                            </div>
-                            <!-- Product actions-->
-                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{{ url_for('moviebooking', filmid=film.film_id) }}">View</a></div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
+    <div class="container">
+        <div class="row">
+            <div class="col-8">
+                <h2 class="mb-4">Product List</h2>
+                <table class="table table-striped" id="product_table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.id }}</td>
+                            <td>{{ product.name }}<br><img src="{{ product.image_url }}" alt="{{ product.name }}" class="img-thumbnail" style="width: 100px; height: auto;"></td>
+                            <td>{{ product.quantity }}</td>
+                            <td>${{ product.price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-4">
+
             </div>
         </div>
-    </section>
+    </div>
+    
+<!--    &lt;!&ndash; Header&ndash;&gt;-->
+<!--    <header class="bg-dark py-5">-->
+<!--        <div class="container px-4 px-lg-5 my-5">-->
+<!--            <div class="text-center text-white">-->
+<!--                &lt;!&ndash; Movie-themed background image &ndash;&gt;-->
+<!--                <img src="{{ url_for('static', filename='img/posterIndex.jpg') }}" alt="Movie Background" style="width: 100%; max-width: 600px; height: auto;">-->
+<!--                <h1 class="display-4 fw-bolder" style="font-family: 'YourMovieFont', sans-serif;">Explore the Cinematic World</h1>-->
+<!--                <p class="lead fw-normal text-white-50 mb-0">Discover the latest movies and cinematic experiences</p>-->
+<!--                <p class="lead fw-normal text-white-50 mb-0">Get tickets now!</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </header>-->
+
+<!--    &lt;!&ndash; Section - Movies &ndash;&gt;-->
+<!--    <section class="py-5">-->
+<!--        <div class="container px-4 px-lg-5 mt-5">-->
+<!--            <div class="row justify-content-center">-->
+<!--                {% for film in films_list %}-->
+<!--                    <div class="col mb-5">-->
+<!--                        <div class="card h-100">-->
+<!--                            &lt;!&ndash; Product image&ndash;&gt;-->
+<!--                            <img src="data:image/png;base64,{{ film.film_poster_base64 }}" alt="Film Poster">-->
+<!--                            &lt;!&ndash; Product details&ndash;&gt;-->
+<!--                            <div class="card-body p-4">-->
+<!--                                <div class="text-center">-->
+<!--                                    &lt;!&ndash; Product name&ndash;&gt;-->
+<!--                                    <h5 class="fw-bolder">{{ film.film_name }}</h5>-->
+<!--                                    &lt;!&ndash; Product Run Time&ndash;&gt;-->
+<!--                                    <p>Duration: {{ film.film_runtime }} minutes</p>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            &lt;!&ndash; Product actions&ndash;&gt;-->
+<!--                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">-->
+<!--                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{{ url_for('moviebooking', filmid=film.film_id) }}">View</a></div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                {% endfor %}-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </section>-->
 
     <!-- Footer-->
     {% include 'footer.html'%}

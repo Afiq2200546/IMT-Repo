@@ -17,6 +17,20 @@ from blueprints.filmmaker import filmmaker, updateFilmScreeningStatus
 from datetime import datetime
 import base64
 
+from dotenv import load_dotenv
+import os
+
+from modules.aws_db import DatabaseCRUD
+
+load_dotenv()
+
+aws_db = DatabaseCRUD(
+        host=os.getenv('MYSQL_HOST'),
+        user=os.getenv('MYSQL_USER'),
+        password=os.getenv('MYSQL_PASSWORD'),
+        database=os.getenv('MYSQL_DB')
+    )
+
 # Create a Flask app and set a secret key
 app = Flask(__name__)
 app.app_context().push()
@@ -37,44 +51,51 @@ def close_connection(exception):
 # Define home route
 @app.route("/")
 def home():
-    if "accountId" in session and "accountRole" in session:
-        id = session["accountId"]
-        role = session["accountRole"]
+    aws_db.connect()
 
-        if role == "filmmaker":
-            return redirect(url_for("filmmaker.dashboard"))
+    products = aws_db.get_all_products()
+    print(products)
 
-    try:
-        # Connect to the database
-        db = get_sqlite_database()
-        cursor = db.cursor()
-
-        # Display all films from the database
-        cursor.execute(
-            "SELECT DISTINCT Film.filmId, Film.filmName, Film.filmRunTime, Film.filmPoster FROM Film JOIN Screening ON Film.filmId = Screening.filmId WHERE Screening.screeningStatus != 'Finished'"
-        )
-        films_data = cursor.fetchall()
-        films_list = []
-
-        for film_data in films_data:
-            film_id, film_name, film_runtime, film_poster_blob = film_data
-
-            # Convert Blob to Base64 String
-            film_poster_base64 = base64.b64encode(film_poster_blob).decode("utf-8")
-
-            film_info = {
-                "film_id": film_id,
-                "film_name": film_name,
-                "film_runtime": film_runtime,
-                "film_poster_base64": film_poster_base64,
-            }
-            films_list.append(film_info)
-
-        return render_template("index.html", films_list=films_list)
-
-    except Exception as e:
-        db.rollback()
-        print(f"An error occurred: {e}")
+    aws_db.disconnect()
+    return render_template("index.html", products=products)
+    # if "accountId" in session and "accountRole" in session:
+    #     id = session["accountId"]
+    #     role = session["accountRole"]
+    #
+    #     if role == "filmmaker":
+    #         return redirect(url_for("filmmaker.dashboard"))
+    #
+    # try:
+    #     # Connect to the database
+    #     db = get_sqlite_database()
+    #     cursor = db.cursor()
+    #
+    #     # Display all films from the database
+    #     cursor.execute(
+    #         "SELECT DISTINCT Film.filmId, Film.filmName, Film.filmRunTime, Film.filmPoster FROM Film JOIN Screening ON Film.filmId = Screening.filmId WHERE Screening.screeningStatus != 'Finished'"
+    #     )
+    #     films_data = cursor.fetchall()
+    #     films_list = []
+    #
+    #     for film_data in films_data:
+    #         film_id, film_name, film_runtime, film_poster_blob = film_data
+    #
+    #         # Convert Blob to Base64 String
+    #         film_poster_base64 = base64.b64encode(film_poster_blob).decode("utf-8")
+    #
+    #         film_info = {
+    #             "film_id": film_id,
+    #             "film_name": film_name,
+    #             "film_runtime": film_runtime,
+    #             "film_poster_base64": film_poster_base64,
+    #         }
+    #         films_list.append(film_info)
+    #
+    #     return render_template("index.html", films_list=films_list)
+    #
+    # except Exception as e:
+    #     db.rollback()
+    #     print(f"An error occurred: {e}")
 
 
 # Define profile route

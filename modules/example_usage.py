@@ -56,6 +56,9 @@ if __name__ == "__main__":
         for company in companies:
             print(f"{company['id']}: {company['name']} - {company['email']}")
 
+        products = db.get_all_products()
+        print(products)
+
     except Error as e:
         print(f"Database error: {e}")
     finally:

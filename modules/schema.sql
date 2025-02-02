@@ -65,6 +65,7 @@ CREATE TABLE Products (
     quantity INT NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     category_id INT NOT NULL,
+    user_id INT NOT NULL,
     alarm_stock_level INT NOT NULL,
     image_url VARCHAR(300) NOT NULL,
     -- Additional fields can be added here (e.g., description, supplier)
@@ -73,5 +74,9 @@ CREATE TABLE Products (
     CONSTRAINT fk_products_category
         FOREIGN KEY (category_id)
         REFERENCES Category(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_products_user
+        FOREIGN KEY (user_id)
+        REFERENCES Users(id)
         ON DELETE CASCADE
 );

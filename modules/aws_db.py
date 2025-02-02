@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector import Error
 
+
 class DatabaseCRUD:
     def __init__(self, host, user, password, database):
         self.config = {
@@ -118,13 +119,13 @@ class DatabaseCRUD:
             return None
 
     # Products CRUD Operations
-    def create_product(self, name, quantity, price, category_id, alarm_stock_level, image_url):
+    def create_product(self, name, quantity, price, category_id, user_id, alarm_stock_level, image_url):
         try:
             cursor = self.connection.cursor()
             query = """INSERT INTO Products 
-                    (name, quantity, price, category_id, alarm_stock_level, image_url)
-                    VALUES (%s, %s, %s, %s, %s, %s)"""
-            cursor.execute(query, (name, quantity, price, category_id, alarm_stock_level, image_url))
+                    (name, quantity, price, category_id, user_id, alarm_stock_level, image_url)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+            cursor.execute(query, (name, quantity, price, category_id, user_id, alarm_stock_level, image_url))
             self.connection.commit()
             return cursor.lastrowid
         except Error as e:
@@ -141,7 +142,16 @@ class DatabaseCRUD:
             print(f"Error getting products: {e}")
             return None
 
-    def update_product(self, product_id, name=None, quantity=None, price=None, category_id=None, alarm_stock_level=None,
+    def get_all_products(self):
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM Products")
+            return cursor.fetchall()
+        except Error as e:
+            print(f"Error getting products: {e}")
+            return None
+
+    def update_product(self, product_id, name=None, quantity=None, price=None, category_id=None, user_id=None, alarm_stock_level=None,
                        image_url=None):
         try:
             cursor = self.connection.cursor()
@@ -160,6 +170,9 @@ class DatabaseCRUD:
             if category_id is not None:
                 updates.append("category_id = %s")
                 params.append(category_id)
+            if user_id is not None:
+                updates.append("user_id = %s")
+                params.append(user_id)
             if alarm_stock_level is not None:
                 updates.append("alarm_stock_level = %s")
                 params.append(alarm_stock_level)
