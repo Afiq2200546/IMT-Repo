@@ -37,6 +37,15 @@ class DatabaseCRUD:
             print(f"Error creating company: {e}")
             self.connection.rollback()
             return None
+    
+    def get_company(self, company_id):
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM Company WHERE id = %s", (company_id,))
+            return cursor.fetchone()
+        except Error as e:
+            print(f"Error getting company: {e}")
+            return None
 
     def get_all_companies(self):
         try:

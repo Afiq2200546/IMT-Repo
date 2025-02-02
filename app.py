@@ -101,112 +101,26 @@ def home():
 # Define profile route
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
-    if "accountId" in session and "accountRole" in session:
-        id = session["accountId"]
-        role = session["accountRole"]
-        db = get_sqlite_database()
-        cursor = db.cursor()
+    if "accountId" in session:
+        user_id = session["accountId"]
+        aws_db.connect()
+        
+        if request.method == "POST":
+            updated_username = request.form.get("username")
+            updated_email = request.form.get("email")
+            updated_phone_number = request.form.get("phonenumber")
 
-        try:
-            if request.method == "POST":
-                updatedUsername = request.form.get("username")
-                updatedEmail = request.form.get("email")
-                updatedGender = request.form.get("gender")
-                updatedPhoneNumber = request.form.get("phonenumber")
-
-                if role == "user":
-                    cursor.execute(
-                        "UPDATE User SET userName=?, userEmail=?, userGender=?, userPhoneNumber=? WHERE userId = ?",
-                        (
-                            updatedUsername,
-                            updatedEmail,
-                            updatedGender,
-                            updatedPhoneNumber,
-                            id,
-                        ),
-                    )
-                elif role == "filmmaker":
-                    cursor.execute(
-                        "UPDATE Filmmaker SET filmmakerName=?, filmmakerEmail=?, filmmakerGender=?, filmmakerPhoneNumber=? WHERE filmmakerId = ?",
-                        (
-                            updatedUsername,
-                            updatedEmail,
-                            updatedGender,
-                            updatedPhoneNumber,
-                            id,
-                        ),
-                    )
-
-                db.commit()
-                flash("Your account has been updated!", "success")
-                return redirect(url_for("profile"))
-
-            else:
-                if role == "user":
-                    cursor.execute(
-                        "SELECT userName, userEmail, userGender, userPhoneNumber FROM User WHERE userId = ?",
-                        (id,),
-                    )
-
-                elif role == "filmmaker":
-                    cursor.execute(
-                        "SELECT filmmakerName, filmmakerEmail, filmmakerGender, filmmakerPhoneNumber FROM Filmmaker WHERE filmmakerId = ?",
-                        (id,),
-                    )
-
-                account = cursor.fetchone()
-
-                if role == "user":
-                    cursor.execute(
-                        """
-                        SELECT 
-                        Booking.filmName, numberOfTickets, bookingDate, bookingTime, Film.filmId
-                        FROM Booking
-                        JOIN Film ON Film.filmName = Booking.filmName 
-                        WHERE Booking.userid = ?
-                        GROUP BY Booking.bookingId
-                    """,
-                        (id,),
-                    )
-                    user_bookings = cursor.fetchall()
-                    cursor.execute(
-                        """
-                        SELECT 
-                            Film.filmName AS movie_title, 
-                            Film_Review.filmReviewTitle,
-                            Film_Review.filmReviewRating,
-                            Film_Review.filmReviewDescription,
-                            Film_Review.filmReviewId,
-                            Film_Review.filmReviewDate
-                        FROM Film_Review
-                        JOIN Film ON Film_Review.filmId = Film.filmId
-                        WHERE Film_Review.userId = ?
-                    """,
-                        (id,),
-                    )
-                    user_reviews = cursor.fetchall()
-
-                else:
-                    user_bookings = []
-                    user_reviews = []
-                accountUsername, accountEmail, accountGender, accountPhoneNum = account
-                return render_template(
-                    "profilepage.html",
-                    accountUsername=accountUsername,
-                    accountEmail=accountEmail,
-                    accountPhoneNum=accountPhoneNum,
-                    accountGender=accountGender,
-                    user_bookings=user_bookings,
-                    user_reviews=user_reviews,
-                )
-
-        except Exception as e:
-            db.rollback()
-            flash("An error has occurred. Please try again later.", "error")
-            print("Error:", e)
+            aws_db.update_user(user_id, username=updated_username, email=updated_email, phone_number=updated_phone_number)
+            flash("Your account has been updated!", "success")
+            return redirect(url_for("profile"))
+        
+        user = aws_db.get_user(user_id)
+        company = aws_db.get_company(user["company_id"]) if user["company_id"] else None
+        aws_db.disconnect()
+        
+        return render_template("profilepage.html", user=user, company=company)
     else:
         return redirect(url_for("login"))
-
 
 @app.route("/moviebooking/<int:filmid>", methods=["GET", "POST"])
 def moviebooking(filmid):
@@ -385,13 +299,9 @@ def login():
 # Define account logout route
 @app.route("/logout")
 def logout():
-    if "accountId" and "accountRole" in session:
-        session.pop("accountId", None)
-        session.pop("accountRole", None)
-        flash("You have been logged out.", "success")
-        return redirect(url_for("home"))
-    else:
-        return redirect(url_for("login"))
+    session.clear()
+    flash("You have been logged out.", "success")
+    return redirect(url_for("home"))
 
 
 # Define account registration route
