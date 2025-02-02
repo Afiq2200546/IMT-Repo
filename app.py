@@ -68,6 +68,8 @@ def home():
         categories = aws_db.get_categories()
 
         aws_db.disconnect()
+
+        print(aws_user["role"])
         return render_template("index.html", products=products, categories=categories, role=aws_user["role"])
     # if "accountId" in session and "accountRole" in session:
     #     id = session["accountId"]
