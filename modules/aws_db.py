@@ -163,7 +163,7 @@ class DatabaseCRUD:
     def get_products_by_company_id(self, company_id):
         try:
             cursor = self.connection.cursor(dictionary=True)
-            cursor.execute("SELECT * FROM Products, Users, Company "
+            cursor.execute("SELECT Products.* FROM Products, Users, Company "
                            "WHERE Company.id = %s "
                            "AND Users.company_id = Company.id "
                            "AND Products.user_id = Users.id", (company_id,))
