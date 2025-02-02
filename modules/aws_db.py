@@ -118,13 +118,13 @@ class DatabaseCRUD:
             return None
 
     # Products CRUD Operations
-    def create_product(self, name, quantity, price, category_id, alarm_stock_level):
+    def create_product(self, name, quantity, price, category_id, alarm_stock_level, image_url):
         try:
             cursor = self.connection.cursor()
             query = """INSERT INTO Products 
-                    (name, quantity, price, category_id, alarm_stock_level)
-                    VALUES (%s, %s, %s, %s, %s)"""
-            cursor.execute(query, (name, quantity, price, category_id, alarm_stock_level))
+                    (name, quantity, price, category_id, alarm_stock_level, image_url)
+                    VALUES (%s, %s, %s, %s, %s, %s)"""
+            cursor.execute(query, (name, quantity, price, category_id, alarm_stock_level, image_url))
             self.connection.commit()
             return cursor.lastrowid
         except Error as e:

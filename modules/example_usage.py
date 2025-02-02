@@ -45,7 +45,8 @@ if __name__ == "__main__":
         #     quantity=10,
         #     price=999.99,
         #     category_id=category_id,
-        #     alarm_stock_level=5
+        #     alarm_stock_level=5,
+        #     image_url="https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/page/alienware/laptops/alienware-laptops-page-learn-m18-x16-r2-2880x1800-mod06.jpg"
         # )
         # print(f"Created product with ID: {product_id}")
 

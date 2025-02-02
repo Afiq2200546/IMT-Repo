@@ -66,6 +66,7 @@ CREATE TABLE Products (
     price DECIMAL(10,2) NOT NULL,
     category_id INT NOT NULL,
     alarm_stock_level INT NOT NULL,
+    image_url VARCHAR(300) NOT NULL,
     -- Additional fields can be added here (e.g., description, supplier)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
