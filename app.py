@@ -49,7 +49,7 @@ def close_connection(exception):
         db.close()
 
 
-# Define home route
+# Define x route
 @app.route("/")
 def home():
 
@@ -298,7 +298,7 @@ def login():
         user = aws_db.get_user_by_email(email)
         aws_db.disconnect()
 
-        #if user and check_password_hash(user["password"], password):
+        #if user and check_password_hash(user["password"], password): //Uncomment if you want to test for account that you registered.
         if user and user["password"] == password:
             session["accountId"] = user["id"]
             session["accountRole"] = user["role"]
@@ -323,65 +323,28 @@ def logout():
 # Define account registration route
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    aws_db.connect()
+    companies = aws_db.get_all_companies()
+    
     if request.method == "POST":
-        # Get the user input values from the input field
         username = request.form.get("username")
         email = request.form.get("email")
         password_hash = generate_password_hash(request.form.get("password"))
-        phone_number = request.form.get("phonenumber")
-        date_of_birth = request.form.get("dob")
-        gender = request.form.get("gender")
-        identity = request.form.get("identity")
+        company_id = request.form.get("company_id") if request.form.get("company_id") else None
+        role = "Staff"  # Default role for all registered users
 
-        # Connect to the database
-        db = get_sqlite_database()
-        cursor = db.cursor()
+        user_id = aws_db.create_user(username, password_hash, role, email, company_id)
+        aws_db.disconnect()
 
-        try:
-            # Check if creation of the account is a user or filmmaker
-            if identity == "user":
-                cursor.execute(
-                    "INSERT INTO User (userName, userEmail, userPassword, userPhoneNumber, userDOB, "
-                    "userGender) VALUES (?, ?, ?, ?, ?, ?)",
-                    (
-                        username,
-                        email,
-                        password_hash,
-                        phone_number,
-                        date_of_birth,
-                        gender,
-                    ),
-                )
-
-            elif identity == "filmmaker":
-                cursor.execute(
-                    "INSERT INTO Filmmaker (filmmakerName, filmmakerEmail, filmmakerPassword, filmmakerPhoneNumber, filmmakerDOB, "
-                    "filmmakerGender) VALUES (?, ?, ?, ?, ?, ?)",
-                    (
-                        username,
-                        email,
-                        password_hash,
-                        phone_number,
-                        date_of_birth,
-                        gender,
-                    ),
-                )
-            db.commit()
+        if user_id:
             flash("Your account has been created!", "success")
             return redirect(url_for("login"))
-
-        except Exception as e:
-            # Handle database errors and display an error message
-            db.rollback()
-            flash(
-                "An error has occured during registration. Please try again later.",
-                "error",
-            )
-            print("Error", e)
+        else:
+            flash("An error occurred during registration. Please try again later.", "error")
             return redirect(url_for("register"))
-
-    else:
-        return render_template("register.html")
+    
+    aws_db.disconnect()
+    return render_template("register.html", companies=companies)
 
 
 # Define error 404 route
