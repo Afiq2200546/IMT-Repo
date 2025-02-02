@@ -54,16 +54,19 @@ def close_connection(exception):
 def home():
     aws_db.connect()
 
+    if session["accountId"] is None:
+        return render_template("login.html")
+
+    aws_user = aws_db.get_user(session["accountId"])
+
     # products = aws_db.get_all_products()
-    products = aws_db.get_products_by_company_id(1)  # use user company id later
+    products = aws_db.get_products_by_company_id(aws_user["company_id"])  # use user company id later
     # print(products)
 
     categories = aws_db.get_categories()
 
-    # retrieve user later
-
     aws_db.disconnect()
-    return render_template("index.html", products=products, categories=categories)
+    return render_template("index.html", products=products, categories=categories, role=aws_user["role"])
     # if "accountId" in session and "accountRole" in session:
     #     id = session["accountId"]
     #     role = session["accountRole"]
