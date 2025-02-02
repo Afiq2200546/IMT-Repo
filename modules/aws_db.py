@@ -142,6 +142,18 @@ class DatabaseCRUD:
             print(f"Error getting products: {e}")
             return None
 
+    def get_products_by_company_id(self, company_id):
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM Products, Users, Company "
+                           "WHERE Company.id = %s "
+                           "AND Users.company_id = Company.id "
+                           "AND Products.user_id = Users.id", (company_id,))
+            return cursor.fetchall()
+        except Error as e:
+            print(f"Error getting products: {e}")
+            return None
+
     def get_all_products(self):
         try:
             cursor = self.connection.cursor(dictionary=True)
@@ -240,4 +252,13 @@ class DatabaseCRUD:
         except Error as e:
             print(f"Error updating category: {e}")
             self.connection.rollback()
+            return None
+
+    def get_categories(self):
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM Category")
+            return cursor.fetchall()
+        except Error as e:
+            print(f"Error getting products: {e}")
             return None

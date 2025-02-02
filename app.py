@@ -25,11 +25,11 @@ from modules.aws_db import DatabaseCRUD
 load_dotenv()
 
 aws_db = DatabaseCRUD(
-        host=os.getenv('MYSQL_HOST'),
-        user=os.getenv('MYSQL_USER'),
-        password=os.getenv('MYSQL_PASSWORD'),
-        database=os.getenv('MYSQL_DB')
-    )
+    host=os.getenv('MYSQL_HOST'),
+    user=os.getenv('MYSQL_USER'),
+    password=os.getenv('MYSQL_PASSWORD'),
+    database=os.getenv('MYSQL_DB')
+)
 
 # Create a Flask app and set a secret key
 app = Flask(__name__)
@@ -39,6 +39,7 @@ app.config["SECRET_KEY"] = "your_secret_key_here"
 # Register blueprints
 app.register_blueprint(user, url_prefix="/user")
 app.register_blueprint(filmmaker, url_prefix="/filmmaker")
+
 
 # Define teardown app context
 @app.teardown_appcontext
@@ -53,11 +54,16 @@ def close_connection(exception):
 def home():
     aws_db.connect()
 
-    products = aws_db.get_all_products()
-    print(products)
+    # products = aws_db.get_all_products()
+    products = aws_db.get_products_by_company_id(1)  # use user company id later
+    # print(products)
+
+    categories = aws_db.get_categories()
+
+    # retrieve user later
 
     aws_db.disconnect()
-    return render_template("index.html", products=products)
+    return render_template("index.html", products=products, categories=categories)
     # if "accountId" in session and "accountRole" in session:
     #     id = session["accountId"]
     #     role = session["accountRole"]
