@@ -36,6 +36,7 @@
                             <th>Name</th>
                             <th>Quantity</th>
                             <th>Price</th>
+                            <th>Category</th>
                             <th></th>
                             <th></th>
                         </tr>
@@ -47,6 +48,13 @@
                             <td>{{ product.name }}<br><img src="{{ product.image_url }}" alt="{{ product.name }}" class="img-thumbnail" style="width: 100px; height: auto;"></td>
                             <td>{{ product.quantity }}</td>
                             <td>${{ product.price }}</td>
+                            <td>
+                                {% for category in categories %}
+                                    {% if category.id == product.category_id %}
+                                        {{ category.name }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
                             <td><a href="" class="btn btn-primary">Edit</a></td>
                             <td><a href="" class="btn btn-danger">Delete</a></td>
                         </tr>
