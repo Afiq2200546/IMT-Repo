@@ -361,60 +361,25 @@ def get_screenings(filmid, studioid):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        # Get the user input values from the input field
         email = request.form.get("email")
         password = request.form.get("password")
-        identity = request.form.get("identity")
 
-        # Connect to the database
-        db = get_sqlite_database()
-        cursor = db.cursor()
+        aws_db.connect()
+        user = aws_db.get_user_by_email(email)
+        aws_db.disconnect()
 
-        try:
-            # Check if the identity from the login form is user or filmmaker
-            if identity == "user":
-                cursor.execute("SELECT * FROM User WHERE userEmail = ?", (email,))
+        #if user and check_password_hash(user["password"], password):
+        if user and user["password"] == password:
+            session["accountId"] = user["id"]
+            session["accountRole"] = user["role"]
+            flash("You have successfully logged in.", "success")
 
-            elif identity == "filmmaker":
-                cursor.execute(
-                    "SELECT * FROM Filmmaker WHERE filmmakerEmail = ?", (email,)
-                )
-
-            else:
-                return redirect(url_for("login"))
-
-            # Fetch the user or filmmaker account from the database
-            account = cursor.fetchone()
-
-            # Check if the hashed password is the same as the one in the database
-            if account and check_password_hash(account[3], password):
-                # Store account's ID and identity in the session to track their login state
-                session["accountId"] = account[0]
-                session["accountRole"] = identity
-                flash("You have successfully login.", "success")
-
-                # Redirect based on their identity
-                if session["accountRole"] == "user":
-                    return redirect(url_for("home"))
-
-                elif session["accountRole"] == "filmmaker":
-                    return redirect(url_for("filmmaker.dashboard"))
-
-            else:
-                # User cannot be found or password is incorrect
-                db.rollback()
-                flash("Login failed. Please check your email and password.", "error")
-                return redirect(url_for("login"))
-
-        except Exception as e:
-            # Handle database errors and display an error message
-            db.rollback()
-            flash("An error has occured during login. Please try again later.", "error")
-            print("Error", e)
+            return redirect(url_for("home"))
+        else:
+            flash("Login failed. Please check your email and password.", "error")
             return redirect(url_for("login"))
 
-    else:
-        return render_template("login.html")
+    return render_template("login.html")
 
 
 # Define account logout route
