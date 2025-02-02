@@ -52,25 +52,29 @@ def close_connection(exception):
 # Define home route
 @app.route("/")
 def home():
-    aws_db.connect()
 
     print("account: " + str(session.get("accountId")))
 
     if session.get("accountId") is None:
         return redirect(url_for("login"))
     else:
-        aws_user = aws_db.get_user(session["accountId"])
+        if session["accountRole"] == "Admin":
+            return redirect(url_for("login"))  # change to admin dashboard
+        else:
+            aws_db.connect()
 
-        # products = aws_db.get_all_products()
-        products = aws_db.get_products_by_company_id(aws_user["company_id"])  # use user company id later
-        # print(products)
+            aws_user = aws_db.get_user(session["accountId"])
 
-        categories = aws_db.get_categories()
+            # products = aws_db.get_all_products()
+            products = aws_db.get_products_by_company_id(aws_user["company_id"])  # use user company id later
+            # print(products)
 
-        aws_db.disconnect()
+            categories = aws_db.get_categories()
 
-        print(aws_user["role"])
-        return render_template("index.html", products=products, categories=categories, role=aws_user["role"])
+            aws_db.disconnect()
+
+            print(aws_user["role"])
+            return render_template("index.html", products=products, categories=categories, role=aws_user["role"])
     # if "accountId" in session and "accountRole" in session:
     #     id = session["accountId"]
     #     role = session["accountRole"]
