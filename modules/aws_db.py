@@ -140,3 +140,91 @@ class DatabaseCRUD:
         except Error as e:
             print(f"Error getting products: {e}")
             return None
+
+    def update_product(self, product_id, name=None, quantity=None, price=None, category_id=None, alarm_stock_level=None,
+                       image_url=None):
+        try:
+            cursor = self.connection.cursor()
+            updates = []
+            params = []
+
+            if name:
+                updates.append("name = %s")
+                params.append(name)
+            if quantity is not None:
+                updates.append("quantity = %s")
+                params.append(quantity)
+            if price is not None:
+                updates.append("price = %s")
+                params.append(price)
+            if category_id is not None:
+                updates.append("category_id = %s")
+                params.append(category_id)
+            if alarm_stock_level is not None:
+                updates.append("alarm_stock_level = %s")
+                params.append(alarm_stock_level)
+            if image_url:
+                updates.append("image_url = %s")
+                params.append(image_url)
+
+            params.append(product_id)
+            query = f"UPDATE Products SET {', '.join(updates)} WHERE id = %s"
+            cursor.execute(query, params)
+            self.connection.commit()
+            return cursor.rowcount
+        except Error as e:
+            print(f"Error updating product: {e}")
+            self.connection.rollback()
+            return None
+
+    def update_user(self, user_id, username=None, password=None, role=None, email=None, company_id=None):
+        try:
+            cursor = self.connection.cursor()
+            updates = []
+            params = []
+
+            if username:
+                updates.append("username = %s")
+                params.append(username)
+            if password:
+                updates.append("password = %s")
+                params.append(password)
+            if role:
+                updates.append("role = %s")
+                params.append(role)
+            if email:
+                updates.append("email = %s")
+                params.append(email)
+            if company_id is not None:
+                updates.append("company_id = %s")
+                params.append(company_id)
+
+            params.append(user_id)
+            query = f"UPDATE Users SET {', '.join(updates)} WHERE id = %s"
+            cursor.execute(query, params)
+            self.connection.commit()
+            return cursor.rowcount
+        except Error as e:
+            print(f"Error updating user: {e}")
+            self.connection.rollback()
+            return None
+
+    def update_category(self, category_id, name=None):
+        try:
+            cursor = self.connection.cursor()
+            updates = []
+            params = []
+
+            if name:
+                updates.append("name = %s")
+                params.append(name)
+
+            params.append(category_id)
+            query = f"UPDATE Category SET {', '.join(updates)} WHERE id = %s"
+            cursor.execute(query, params)
+            self.connection.commit()
+            return cursor.rowcount
+        except Error as e:
+            print(f"Error updating category: {e}")
+            self.connection.rollback()
+            return None
