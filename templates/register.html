@@ -7,42 +7,45 @@
             <div class="d-flex flex-column min-vh-75" style="padding-top: 2%; padding-bottom: 2%;">
                 <div class="card align-self-center bg-light border-light">
                     <div class="card-body mx-5">
-                        <h3 class="fw-bold mb-4 pt-2 text-center">Register</h3>
+                        <h3 class="fw-bold mb-4 pt-2 text-center">Register New Company</h3>
                         <form method="POST">
-                            <div class="form-group">
-                                <label for="username">Username</label>
-                                <input type="text" name="username" class="form-control" id="Name" placeholder="Name" required>
+                            <!-- Company Information -->
+                            <h5 class="mb-3">Company Information</h5>
+                            <div class="form-group mb-3">
+                                <label for="company_name">Company Name</label>
+                                <input type="text" name="company_name" class="form-control" id="company_name" placeholder="Company Name" required>
                             </div>
 
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="text" name="email" class="form-control" id="Email" placeholder="Email" required>
+                            <div class="form-group mb-3">
+                                <label for="company_email">Company Email</label>
+                                <input type="email" name="company_email" class="form-control" id="company_email" placeholder="Company Email" required>
                             </div>
 
-                            <div class="form-group">
+                            <!-- Admin Account Information -->
+                            <h5 class="mb-3">Admin Account Information</h5>
+                            <div class="form-group mb-3">
+                                <label for="username">Admin Username</label>
+                                <input type="text" name="username" class="form-control" id="Name" placeholder="Admin Username" required>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="email">Admin Email</label>
+                                <input type="email" name="email" class="form-control" id="Email" placeholder="Admin Email" required>
+                            </div>
+
+                            <div class="form-group mb-4">
                                 <label for="password">Password</label>
                                 <input type="password" name="password" class="form-control" id="Password" placeholder="Password" required>
                             </div>
 
-                            <div class="form-group">
-                                <label for="company_id">Company</label>
-                                <select class="form-select" name="company_id" id="company_id" required>
-                                    <option value="" disabled selected>Choose a company</option>
-                                    {% for company in companies %}
-                                        <option value="{{ company.id }}">{{ company.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                            <button type="submit" class="btn btn-dark btn-block mb-4">Register Company & Admin</button>
 
-                            <button type="submit" class="btn btn-dark btn-block mb-4">Register</button>
-
-                            <p class="text-center">Already a member? <br class="d-md-none d-lg-none" />Login <a href="login">here</a>.</p>
+                            <p class="text-center">Already registered? <br class="d-md-none d-lg-none" />Login <a href="login">here</a>.</p>
                         </form>
                     </div>
                 </div>
             </div>
         </main>
         {% include "footer.html" %}
-        
     </body>
 </html>

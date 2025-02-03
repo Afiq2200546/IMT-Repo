@@ -131,27 +131,39 @@ def profile():
         return redirect(url_for("login"))
 
 
-# Define account login route
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
 
-        aws_db.connect()
-        user = aws_db.get_user_by_email(email)
-        aws_db.disconnect()
+        if not email or not password:
+            flash("Please provide both email and password", "danger")
+            return render_template("login.html", error=True)
 
-        #if user and check_password_hash(user["password"], password): //Uncomment if you want to test for account that you registered.
-        if user and user["password"] == password:
+        try:
+            aws_db.connect()
+            user = aws_db.get_user_by_email(email)
+            aws_db.disconnect()
+
+            if not user:
+                flash("Email not found. Please check your email or register.", "danger")
+                return render_template("login.html", error=True)
+            
+            #if not check_password_hash(user["password"], password): #Uncomment this line if using hashed passwords
+            if user["password"] != password:  #Remove this line when using hashed passwords
+                flash("Invalid password. Please try again.", "danger")
+                return render_template("login.html", error=True)
+
+            # Login successful
             session["accountId"] = user["id"]
             session["accountRole"] = user["role"]
-            flash("You have successfully logged in.", "success")
-
+            flash("Login successful!", "success")
             return redirect(url_for("home"))
-        else:
-            flash("Login failed. Please check your email and password.", "error")
-            return redirect(url_for("login"))
+
+        except Exception as e:
+            flash(f"An error occurred while logging in. Please try again.", "danger")
+            return render_template("login.html", error=True)
 
     return render_template("login.html")
 
@@ -167,28 +179,49 @@ def logout():
 # Define account registration route
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    aws_db.connect()
-    companies = aws_db.get_all_companies()
-    
     if request.method == "POST":
+        # Get company information
+        company_name = request.form.get("company_name")
+        company_email = request.form.get("company_email")
+        
+        # Get admin account information
         username = request.form.get("username")
         email = request.form.get("email")
         password_hash = generate_password_hash(request.form.get("password"))
-        company_id = request.form.get("company_id") if request.form.get("company_id") else None
-        role = "Staff"  # Default role for all registered users
 
-        user_id = aws_db.create_user(username, password_hash, role, email, company_id)
-        aws_db.disconnect()
-
-        if user_id:
-            flash("Your account has been created!", "success")
-            return redirect(url_for("login"))
-        else:
-            flash("An error occurred during registration. Please try again later.", "error")
+        aws_db.connect()
+        
+        try:
+            # Create new company
+            company_id = aws_db.create_company(company_name, company_email)
+            
+            if company_id:
+                # Create admin user associated with the company
+                user_id = aws_db.create_user(
+                    username=username,
+                    password=password_hash,
+                    role="Admin",
+                    email=email,
+                    company_id=company_id
+                )
+                
+                if user_id:
+                    aws_db.disconnect()
+                    flash("Company and admin account created successfully!", "success")
+                    return redirect(url_for("login"))
+                else:
+                    # If user creation fails, delete the company
+                    aws_db.delete_company(company_id)
+                    raise Exception("Failed to create admin user")
+            else:
+                raise Exception("Failed to create company")
+                
+        except Exception as e:
+            aws_db.disconnect()
+            flash(f"Registration failed: {str(e)}", "error")
             return redirect(url_for("register"))
-    
-    aws_db.disconnect()
-    return render_template("register.html", companies=companies)
+
+    return render_template("register.html")
 
 
 # Define error 404 route
