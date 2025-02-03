@@ -107,7 +107,6 @@ def home():
     #     print(f"An error occurred: {e}")
 
 
-# Define profile route
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     if "accountId" in session:
@@ -117,9 +116,33 @@ def profile():
         if request.method == "POST":
             updated_username = request.form.get("username")
             updated_email = request.form.get("email")
+            current_password = request.form.get("current_password")
+            new_password = request.form.get("new_password")
+            confirm_password = request.form.get("confirm_password")
 
+            user = aws_db.get_user(user_id)
+
+            # If password change is requested
+            if current_password and new_password and confirm_password:
+                # Check if current password is correct
+                #if not check_password_hash(user["password"], current_password):
+                if not user["password"]:
+                    flash("Current password is incorrect.", "danger")
+                    return redirect(url_for("profile"))
+
+                # Check if new passwords match
+                if new_password != confirm_password:
+                    flash("New passwords do not match.", "danger")
+                    return redirect(url_for("profile"))
+
+                # Update password
+                #password_hash = generate_password_hash(new_password_
+                aws_db.update_user(user_id, password=new_password)
+                flash("Password updated successfully!", "success")
+
+            # Update other user information
             aws_db.update_user(user_id, username=updated_username, email=updated_email)
-            flash("Your account has been updated!", "success")
+            flash("Your profile has been updated!", "success")
             return redirect(url_for("profile"))
         
         user = aws_db.get_user(user_id)

@@ -1,67 +1,93 @@
 <html lang="en">
-<head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="{{ url_for('static',filename='styles/profilepage.css') }}">
-    <link href="{{ url_for('static', filename='styles/styles.css') }}" rel="stylesheet">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% include "header.html" %}
-</head>
-
-<body class="d-flex flex-column min-vh-100 bg-light">
-    {% include "navbar.html" %}
-    
-    <main class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0">Personal Information</h4>
+    <body>
+        {% include "navbar.html" %}
+        <main class="container py-4">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                    <div class="card-body p-4">
-                        <form action="/profile" method="post">
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Username</label>
-                                <input type="text" id="username" name="username" 
-                                    class="form-control form-control-lg" 
-                                    value="{{ user.username }}">
-                            </div>
+                {% endif %}
+            {% endwith %}
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Email</label>
-                                <input type="email" id="email" name="email" 
-                                    class="form-control form-control-lg" 
-                                    value="{{ user.email }}">
-                            </div>
-
-                            <div class="row mb-4">
-                                <div class="col-md-6 mb-3 mb-md-0">
-                                    <label class="form-label fw-bold">Role</label>
-                                    <input type="text" class="form-control form-control-lg" 
-                                        value="{{ user.role }}" readonly>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Company</label>
-                                    <input type="text" class="form-control form-control-lg" 
-                                        value="{{ company.name if company else 'N/A' }}" readonly>
+            <div class="row justify-content-center">
+                <!-- Profile Sidebar -->
+                <div class="col-lg-3 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mx-auto" style="width: 100px; height: 100px;">
+                                    <h1>{{ user.username[0].upper() }}</h1>
                                 </div>
                             </div>
+                            <h5 class="card-title mb-1">{{ user.username }}</h5>
+                            <p class="text-muted mb-3">{{ user.role }}</p>
+                            {% if company %}
+                                <div class="badge bg-primary px-3 py-2">{{ company.name }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
 
-                            <div class="d-grid">
-                                <button type="submit" 
-                                    class="btn btn-primary btn-lg">
-                                    Update Profile
-                                </button>
-                            </div>
-                        </form>
+                <!-- Profile Settings -->
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h4 class="card-title mb-4">Profile Settings</h4>
+                            <form method="POST">
+                                <!-- Profile Information -->
+                                <div class="mb-4">
+                                    <h6 class="text-uppercase fw-bold text-muted small mb-3">Basic Information</h6>
+                                    <div class="form-group mb-3">
+                                        <label for="username" class="form-label">Username</label>
+                                        <input type="text" name="username" class="form-control" id="username" value="{{ user.username }}" required>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" name="email" class="form-control" id="email" value="{{ user.email }}" required>
+                                    </div>
+                                </div>
+
+                                <!-- Change Password -->
+                                <div class="mb-4">
+                                    <h6 class="text-uppercase fw-bold text-muted small mb-3">Change Password</h6>
+                                    <div class="form-group mb-3">
+                                        <label for="current_password" class="form-label">Current Password</label>
+                                        <input type="password" name="current_password" class="form-control" id="current_password" placeholder="Enter current password">
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label for="new_password" class="form-label">New Password</label>
+                                        <input type="password" name="new_password" class="form-control" id="new_password" placeholder="Enter new password">
+                                    </div>
+
+                                    <div class="form-group mb-4">
+                                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                        <input type="password" name="confirm_password" class="form-control" id="confirm_password" placeholder="Confirm new password">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block w-100 py-2">Save Changes</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
+        {% include "footer.html" %}
 
-    {% include "footer.html" %}
-</body>
+        <!-- Add Bootstrap JavaScript and Popper.js -->
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    </body>
 </html>
