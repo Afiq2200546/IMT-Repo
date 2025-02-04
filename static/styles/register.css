@@ -1,175 +1,108 @@
-body {
-  background-color: #dbdbdb;
-  font-size: 1.6rem;
-  font-family: "Open Sans", sans-serif;
-  color: #2b3e51;
+<html lang="en">
+    {% include "header.html" %}
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles/loginpage.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        {% include "navbar.html" %}
+        <main>
+            <section class="white">
+                <div class="text1">Welcome to</div>
+                <div class="logo-section">
+                    <img class="logo" src="{{ url_for('static', filename='img/IMT_SOLUTIONS.png') }}" alt="Logo">
+                </div>
+                <div class="text2">Sign up to streamline inventory management with powerful tracking</div>
+                <div class="text2">and alerts at your fingertips</div>
+            </section>
+            <section>
+                <div class="text3">Register New Company</div>
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  margin: 0;
-}
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="notification">
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
 
-h2 {
-  font-weight: 300;
-  text-align: center;
-}
+                <form method="POST">
+                    <div class="login-form">
+                        <div class="text4">Company Name</div>
+                        <div class="form-group">
+                            <input
+                                class="{% if error %}is-invalid{% endif %} credential"
+                                type="text"
+                                name="company_name"
+                                id="company_name"
+                                placeholder="Enter your company name"
+                                required
+                                value="{{ request.form.email }}"
+                            >
+                        </div>
+                        <div class="text4">Company Email</div>
+                        <div class="form-group">
+                            <input
+                                class="{% if error %}is-invalid{% endif %} credential"
+                                type="email"
+                                name="company_email"
+                                id="company_email"
+                                maxlength="45"
+                                placeholder="Enter your company email"
+                                required
+                                value="{{ request.form.email }}"
+                            >
+                        </div>
+                        <div class="text4">Admin Username</div>
+                        <div class="form-group">
+                            <input
+                                class="{% if error %}is-invalid{% endif %} credential"
+                                type="text"
+                                name="username"
+                                placeholder="Enter your username"
+                                id="Name"
+                                required
+                            >
+                        </div>
+                        <div class="text4">Admin Email</div>
+                        <div class="form-group">
+                            <input
+                                class="{% if error %}is-invalid{% endif %} credential"
+                                type="email"
+                                name="email"
+                                placeholder="Enter your email"
+                                id="Email"
+                                maxlength="45"
+                                required
+                            >
+                        </div>
+                        <div class="text4">Password</div>
+                        <div class="form-group">
+                            <input
+                                class="{% if error %}is-invalid{% endif %} credential"
+                                type="password"
+                                name="password"
+                                placeholder="Enter your password"
+                                id="Password"
+                                minlength="8"
+                                required
+                            >
+                        </div>
+                    </div>
 
-p {
-  position: relative;
-}
-
-a,
-a:link,
-a:visited,
-a:active {
-  color: #3ca9e2;
-  -webkit-transition: all 0.2s ease;
-  transition: all 0.2s ease;
-}
-a:focus, a:hover,
-a:link:focus,
-a:link:hover,
-a:visited:focus,
-a:visited:hover,
-a:active:focus,
-a:active:hover {
-  color: #329dd5;
-  -webkit-transition: all 0.2s ease;
-  transition: all 0.2s ease;
-}
-
-#register-form-wrap {
-  background-color: #fff;
-  width: 35%;
-  margin: 30px auto;
-  text-align: center;
-  padding: 20px 0 0 0;
-  border-radius: 4px;
-  box-shadow: 0px 30px 50px 0px rgba(0, 0, 0, 0.2);
-}
-
-#register-form {
-  padding: 0 60px;
-}
-
-input {
-  display: block;
-  box-sizing: border-box;
-  width: 100%;
-  outline: none;
-  height: 60px;
-  line-height: 60px;
-  border-radius: 4px;
-}
-
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="number"],
-input[type="date"]  {
-  width: 100%;
-  padding: 0 0 0 10px;
-  margin: 0;
-  color: #8a8b8e;
-  border: 1px solid #c2c0ca;
-  font-style: normal;
-  font-size: 16px;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  position: relative;
-  display: inline-block;
-  background: none;
-}
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus {
-  border-color: #3ca9e2;
-}
-input[type="text"]:focus:invalid,
-input[type="email"]:focus:invalid,
-input[type="password"]:focus:invalid,
-input[type="number"]:focus:invalid,
-input[type="date"]:focus:invalid  {
-  color: #cc1e2b;
-  border-color: #cc1e2b;
-}
-
-input[type="text"]:valid ~ .validation span,
-input[type="email"]:valid ~ .validation span,
-input[type="password"]:valid ~ .validation span,
-input[type="number"]:valid ~ .validation span, 
-input[type="date"]:valid ~ .validation span {
-  background: #0C0;
-  position: absolute;
-  border-radius: 6px;
-}
-input[type="text"]:valid ~ .validation span:first-child,
-input[type="email"]:valid ~ .validation span:first-child,
-input[type="password"]:valid ~ .validation span:first-child,
-input[type="number"]:valid ~ .validation span:first-child,
-input[type="date"]:valid ~ .validation span:first-child   {
-  top: 30px;
-  left: 14px;
-  width: 20px;
-  height: 3px;
-  -webkit-transform: rotate(-45deg);
-          transform: rotate(-45deg);
-}
-input[type="text"]:valid ~ .validation span:last-child,
-input[type="email"]:valid ~ .validation span:last-child,
-input[type="password"]:valid ~ .validation span:last-child,
-input[type="number"]:valid ~ .validation span:last-child,
-input[type="date"]:valid ~ .validation span:last-child {
-  top: 35px;
-  left: 8px;
-  width: 11px;
-  height: 3px;
-  -webkit-transform: rotate(45deg);
-          transform: rotate(45deg);
-}
-
-.validation {
-  display: none;
-  position: absolute;
-  content: " ";
-  height: 60px;
-  width: 30px;
-  right: 15px;
-  top: 0px;
-}
-
-input[type="submit"] {
-  border: none;
-  display: block;
-  background-color: #3ca9e2;
-  color: #fff;
-  font-weight: bold;
-  text-transform: uppercase;
-  cursor: pointer;
-  -webkit-transition: all 0.2s ease;
-  transition: all 0.2s ease;
-  font-size: 18px;
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-  text-align: center;
-}
-input[type="submit"]:hover {
-  background-color: #329dd5;
-  -webkit-transition: all 0.2s ease;
-  transition: all 0.2s ease;
-}
-
-#create-account-wrap {
-  background-color: #eeedf1;
-  color: #8a8b8e;
-  font-size: 14px;
-  width: 100%;
-  padding: 10px 0;
-  border-radius: 0 0 4px 4px;
-}
+                    <div class="button-container">
+                        <button type="submit" class="btn">REGISTER</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+        {% include "footer.html" %}
+    </body>
+</html>
