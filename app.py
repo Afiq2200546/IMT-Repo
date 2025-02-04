@@ -246,6 +246,95 @@ def register():
 
     return render_template("register.html")
 
+# Combine both routes into one
+@app.route("/product/<int:product_id>", methods=["GET", "POST"])
+@app.route("/product/new", methods=["GET", "POST"])
+def manage_product(product_id=None):
+    if not session.get("accountId"):
+        return redirect(url_for("login"))
+    
+    aws_db.connect()
+    user = aws_db.get_user(session["accountId"])
+    
+    # For creating new product, only Manager can access
+    if product_id is None and user["role"] != "Manager":
+        flash("Only Managers can create new products.", "danger")
+        return redirect(url_for("home"))
+    
+    # For editing, Admin cannot access
+    if product_id is not None and user["role"] == "Admin":
+        flash("Admins don't have permission to edit products.", "danger")
+        return redirect(url_for("home"))
+    
+    # Get existing product if editing
+    product = aws_db.get_product(product_id) if product_id else None
+    is_update = product is not None
+
+    if request.method == "POST":
+        name = request.form.get("name")
+        quantity = request.form.get("quantity")
+        price = request.form.get("price")
+        category_id = request.form.get("category_id")
+        alarm_stock_level = request.form.get("alarm_stock_level")
+        image_url = request.form.get("image_url")
+        
+        try:
+            if is_update:
+                aws_db.update_product(
+                    product_id,
+                    name=name,
+                    quantity=int(quantity),
+                    price=float(price),
+                    category_id=int(category_id),
+                    alarm_stock_level=int(alarm_stock_level),
+                    image_url=image_url
+                )
+                flash("Product updated successfully!", "success")
+            else:
+                aws_db.create_product(
+                    name=name,
+                    quantity=int(quantity),
+                    price=float(price),
+                    category_id=int(category_id),
+                    user_id=user["id"],
+                    alarm_stock_level=int(alarm_stock_level),
+                    image_url=image_url
+                )
+                flash("Product created successfully!", "success")
+            return redirect(url_for("home"))
+        except Exception as e:
+            flash(f"Error {'updating' if is_update else 'creating'} product: {str(e)}", "danger")
+    
+    categories = aws_db.get_categories()
+    aws_db.disconnect()
+        
+    return render_template(
+        "manage_product.html",
+        product=product,
+        categories=categories,
+        is_update=is_update
+    )
+@app.route("/product/delete/<int:product_id>", methods=["POST"])
+def delete_product(product_id):
+    if not session.get("accountId"):
+        return redirect(url_for("login"))
+    
+    aws_db.connect()
+    user = aws_db.get_user(session["accountId"])
+    
+    # Check if user has permission (Manager or Staff)
+    if user["role"] == "Admin":
+        flash("Admins don't have permission to delete products.", "danger")
+        return redirect(url_for("home"))
+    
+    try:
+        aws_db.delete_product(product_id)
+        flash("Product deleted successfully!", "success")
+    except Exception as e:
+        flash(f"Error deleting product: {str(e)}", "danger")
+    
+    aws_db.disconnect()
+    return redirect(url_for("home"))
 
 # Define error 404 route
 @app.route("/error")

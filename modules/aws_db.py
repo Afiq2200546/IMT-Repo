@@ -220,6 +220,26 @@ class DatabaseCRUD:
             self.connection.rollback()
             return None
 
+    def get_product(self, product_id):
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM Products WHERE id = %s", (product_id,))
+            return cursor.fetchone()
+        except Error as e:
+            print(f"Error getting product: {e}")
+            return None
+
+    def delete_product(self, product_id):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("DELETE FROM Products WHERE id = %s", (product_id,))
+            self.connection.commit()
+            return cursor.rowcount
+        except Error as e:
+            print(f"Error deleting product: {e}")
+            self.connection.rollback()
+            return None
+
     def update_user(self, user_id, username=None, password=None, role=None, email=None, company_id=None):
         try:
             cursor = self.connection.cursor()
