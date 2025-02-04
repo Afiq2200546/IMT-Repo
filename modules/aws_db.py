@@ -123,6 +123,27 @@ class DatabaseCRUD:
             print(f"Error fetching user: {e}")
             return None
 
+    
+    def get_users_by_company(self, company_id):
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM Users WHERE company_id = %s", (company_id,))
+            return cursor.fetchall()
+        except Error as e:
+            print(f"Error getting company users: {e}")
+            return None
+
+    def delete_user(self, user_id):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("DELETE FROM Users WHERE id = %s", (user_id,))
+            self.connection.commit()
+            return cursor.rowcount
+        except Error as e:
+            print(f"Error deleting user: {e}")
+            self.connection.rollback()
+            return None
+
     # Add similar CRUD methods for Category and Products
     # Category CRUD Operations
     def create_category(self, name):

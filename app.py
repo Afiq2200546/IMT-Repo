@@ -44,29 +44,23 @@ def close_connection(exception):
 # Define x route
 @app.route("/")
 def home():
-
-    print("account: " + str(session.get("accountId")))
-
-    if session.get("accountId") is None:
+    if not session.get("accountId"):
         return redirect(url_for("login"))
+
+    aws_db.connect()
+    user = aws_db.get_user(session["accountId"])
+
+    if user["role"] == "Admin":
+        # Get all users from the same company for admin dashboard
+        company_users = aws_db.get_users_by_company(user["company_id"])
+        aws_db.disconnect()
+        return render_template("admin_dashboard.html", users=company_users)
     else:
-        if session["accountRole"] == "Admin":
-            return redirect(url_for("login"))  # change to admin dashboard
-        else:
-            aws_db.connect()
-
-            aws_user = aws_db.get_user(session["accountId"])
-
-            # products = aws_db.get_all_products()
-            products = aws_db.get_products_by_company_id(aws_user["company_id"])  # use user company id later
-            # print(products)
-
-            categories = aws_db.get_categories()
-
-            aws_db.disconnect()
-
-            print(aws_user["role"])
-            return render_template("index.html", products=products, categories=categories, role=aws_user["role"])
+        # Regular product listing for Staff and Manager
+        products = aws_db.get_products_by_company_id(user["company_id"])
+        categories = aws_db.get_categories()
+        aws_db.disconnect()
+        return render_template("index.html", products=products, categories=categories, role=user["role"])
     # if "accountId" in session and "accountRole" in session:
     #     id = session["accountId"]
     #     role = session["accountRole"]
@@ -332,6 +326,89 @@ def delete_product(product_id):
         flash("Product deleted successfully!", "success")
     except Exception as e:
         flash(f"Error deleting product: {str(e)}", "danger")
+    
+    aws_db.disconnect()
+    return redirect(url_for("home"))
+
+@app.route("/user/<int:user_id>", methods=["GET", "POST"])
+@app.route("/user/new", methods=["GET", "POST"])
+def manage_user(user_id=None):
+    if not session.get("accountId"):
+        return redirect(url_for("login"))
+    
+    aws_db.connect()
+    admin = aws_db.get_user(session["accountId"])
+    
+    # Only Admin can access
+    if admin["role"] != "Admin":
+        flash("Only administrators can access this page.", "danger")
+        return redirect(url_for("home"))
+    
+    # Get existing user if editing
+    user = aws_db.get_user(user_id) if user_id else None
+    is_update = user is not None
+
+    if request.method == "POST":
+        username = request.form.get("username")
+        email = request.form.get("email")
+        role = request.form.get("role")
+        password = request.form.get("password")
+        
+        try:
+            if is_update:
+                # Don't update password if not provided
+                if password:
+                    password_hash = generate_password_hash(password)
+                    aws_db.update_user(user_id, username=username, email=email, role=role, password=password_hash)
+                else:
+                    aws_db.update_user(user_id, username=username, email=email, role=role)
+                flash("User updated successfully!", "success")
+            else:
+                password_hash = generate_password_hash(password)
+                aws_db.create_user(
+                    username=username,
+                    password=password_hash,
+                    role=role,
+                    email=email,
+                    company_id=admin["company_id"]
+                )
+                flash("User created successfully!", "success")
+            return redirect(url_for("home"))
+        except Exception as e:
+            flash(f"Error {'updating' if is_update else 'creating'} user: {str(e)}", "danger")
+    
+    aws_db.disconnect()
+    return render_template("manage_user.html", user=user, is_update=is_update)
+
+@app.route("/user/delete/<int:user_id>", methods=["POST"])
+def delete_user(user_id):
+    if not session.get("accountId"):
+        return redirect(url_for("login"))
+    
+    aws_db.connect()
+    admin = aws_db.get_user(session["accountId"])
+    
+    # Only Admin can delete users
+    if admin["role"] != "Admin":
+        flash("Only administrators can delete users.", "danger")
+        return redirect(url_for("home"))
+    
+    # Cannot delete self
+    if user_id == admin["id"]:
+        flash("You cannot delete your own account.", "danger")
+        return redirect(url_for("home"))
+    
+    try:
+        target_user = aws_db.get_user(user_id)
+        # Can only delete users from same company
+        if target_user["company_id"] != admin["company_id"]:
+            flash("You can only delete users from your own company.", "danger")
+            return redirect(url_for("home"))
+        
+        aws_db.delete_user(user_id)
+        flash("User deleted successfully!", "success")
+    except Exception as e:
+        flash(f"Error deleting user: {str(e)}", "danger")
     
     aws_db.disconnect()
     return redirect(url_for("home"))

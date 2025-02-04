@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ 'Edit' if is_update else 'Create' }} User</title>
+
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css"/>
+    <link href="{{ url_for('static', filename='styles/styles.css') }}" rel="stylesheet" />
+    <style>
+        .user-form {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navigation-->
+    {% include 'navbar.html' %}
+
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Admin Dashboard</a></li>
+                        <li class="breadcrumb-item active">{{ 'Edit' if is_update else 'Create' }} User</li>
+                    </ol>
+                </nav>
+
+                <div class="user-form">
+                    <h2 class="mb-4">{{ 'Edit' if is_update else 'Create New' }} User</h2>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                       value="{{ user.username if is_update else '' }}" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ user.email if is_update else '' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="Staff" {% if is_update and user.role == 'Staff' %}selected{% endif %}>Staff</option>
+                                <option value="Manager" {% if is_update and user.role == 'Manager' %}selected{% endif %}>Manager</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label">
+                                {% if is_update %}
+                                New Password (leave blank to keep current)
+                                {% else %}
+                                Password
+                                {% endif %}
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   {% if not is_update %}required{% endif %}>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('home') }}" class="btn btn-secondary">Back to Dashboard</a>
+                            <button type="submit" class="btn btn-{{ 'primary' if is_update else 'success' }}">
+                                {{ 'Update' if is_update else 'Create' }} User
+                            </button>
