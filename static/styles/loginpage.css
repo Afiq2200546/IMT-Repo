@@ -1,0 +1,120 @@
+body {
+    background-image: url('../img/Background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 120vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+section {
+    padding: 20px;
+    flex: 1;
+    min-width: 300px;
+    text-align: center;
+}
+
+
+section:first-child {
+    flex: 15;
+}
+
+section:last-child {
+    flex: 19;
+}
+
+.white {
+    color: #FFFFFF;
+}
+
+.text1 {
+    font-size: 28px;
+    padding-top: 50px;
+}
+
+.text2 {
+    font-size: 12px;
+}
+
+.text3 {
+    font-size: 28px;
+    font-weight: 500;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.text4 {
+    font-size: 25px;
+    font-weight: 500;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.logo-section {
+    padding-top: 130px;
+    padding-bottom: 150px;
+}
+
+.logo {
+    height: 50px;
+}
+
+.login-form {
+    text-align: left;
+    width: 800px;
+    padding-left: 130px;
+}
+
+.credential {
+    height: 40px;
+    font-size: 20px;
+    width: 550px;
+    border: none;
+    border-bottom: 4px solid lightblue;
+    outline: none;
+}
+
+.credential:focus {
+    border-bottom: 4px solid lightblue;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    padding-top: 50px;
+}
+
+.btn {
+    border: none;
+    background-color: rgba(62,170,206,255);
+    color: white;
+    cursor: pointer;
+    border-radius: 25px;
+    height: 50px;
+    width: 170px;
+}
+
+.btn:hover {
+    background-color: rgba(18,112,166,255);
+    color: white;
+}
+
+.register {
+    padding-top: 13px;
+}
+
+.notification {
+    width: 680px;
+    padding-left: 130px;
+}
