@@ -38,25 +38,24 @@ section:last-child {
 
 .text1 {
     font-size: 28px;
-    padding-top: 50px;
+    padding-top: 40px;
 }
 
 .text2 {
-    font-size: 12px;
+    font-size: 15px;
 }
 
 .text3 {
     font-size: 28px;
     font-weight: 500;
-    padding-top: 50px;
-    padding-bottom: 50px;
+    padding-top: 40px;
+    padding-bottom: 30px;
 }
 
 .text4 {
     font-size: 25px;
     font-weight: 500;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 15px;
 }
 
 .logo-section {
@@ -92,7 +91,7 @@ section:last-child {
     justify-content: center;
     align-items: center;
     gap: 50px;
-    padding-top: 50px;
+    padding-top: 30px;
 }
 
 .btn {
