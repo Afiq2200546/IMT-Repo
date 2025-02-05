@@ -1,7 +1,7 @@
 -- ====================================================
 -- Use the database (assumes it already exists)
 -- ====================================================
-USE `database-1`;
+USE `imt-database`;
 
 -- ====================================================
 -- Insert data into the Company table

@@ -1,8 +1,8 @@
 -- ====================================================
 -- Create the database (if it doesn't already exist)
 -- ====================================================
-CREATE DATABASE IF NOT EXISTS `database-1`;
-USE `database-1`;
+CREATE DATABASE IF NOT EXISTS `imt-database`;
+USE `imt-database`;
 
 -- ====================================================
 -- DROP EXISTING TABLES (if needed)
