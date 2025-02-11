@@ -8,7 +8,7 @@ from flask import (
     flash,
     g,
 )
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from dotenv import load_dotenv
 import os
@@ -163,8 +163,8 @@ def login():
                 flash("Email not found. Please check your email or register.", "danger")
                 return render_template("login.html", error=True)
             
-            #if not check_password_hash(user["password"], password): #Uncomment this line if using hashed passwords
-            if user["password"] != password:  #Remove this line when using hashed passwords
+            if not check_password_hash(user["password"], password): #Uncomment this line if using hashed passwords
+            # if user["password"] != password:  #Remove this line when using hashed passwords
                 flash("Invalid password. Please try again.", "danger")
                 return render_template("login.html", error=True)
 
