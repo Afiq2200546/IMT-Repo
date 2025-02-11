@@ -1,4 +1,3 @@
-import pymongo
 from flask import (
     Flask,
     render_template,
@@ -8,11 +7,8 @@ from flask import (
     session,
     flash,
     g,
-    jsonify,
 )
-from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
-import base64
+from werkzeug.security import generate_password_hash
 
 from dotenv import load_dotenv
 import os
