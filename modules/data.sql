@@ -29,9 +29,45 @@ INSERT INTO Users (username, password, role, email, company_id) VALUES
 -- (Product categories)
 -- ====================================================
 INSERT INTO Category (name) VALUES
-    ('Electronics'),
-    ('Clothing'),
-    ('Home & Garden');
+    ('Mobile Phones & Accessories'),
+    ('Computers & Peripherals'),
+    ('Cameras & Photography'),
+    ('Smart Home Devices'),
+    ('Appliances'),
+    ('Footwear'),
+    ('Bags & Luggage'),
+    ('Watches'),
+    ('Eyewear'),
+    ('Personal Care'),
+    ('Fitness & Wellness'),
+    ('Cycling'),
+    ('Camping & Hiking'),
+    ('Fishing & Hunting'),
+    ('Water Sports'),
+    ('Arts & Collectibles'),
+    ('Vintage & Antiques'),
+    ('Gourmet & Specialty Foods'),
+    ('Alcohol & Beverages'),
+    ('Safety & Security'),
+    ('Medical Equipment'),
+    ('Construction & Building Materials'),
+    ('Agricultural Supplies'),
+    ('Renewable Energy & Solar Products'),
+    ('Event & Party Supplies'),
+    ('Travel & Adventure Gear'),
+    ('Gaming & Esports'),
+    ('Adult Products'),
+    ('Military & Tactical Gear'),
+    ('Car & Motorcycle Parts'),
+    ('Home Improvement'),
+    ('Garden Tools & Equipment'),
+    ('DIY & Woodworking'),
+    ('Scientific Instruments'),
+    ('Lab & Testing Equipment'),
+    ('Educational Supplies'),
+    ('Religious Items'),
+    ('Eco-Friendly & Sustainable Products'),
+    ('Wholesale & Bulk Items');
 
 -- ====================================================
 -- Insert data into the Products table
